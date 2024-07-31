@@ -56,7 +56,8 @@ def topic_handlers_to_dataframe(topic_handlers):
                 cols.append('no data')
             else:
                 data = np.array(bins[col_id])
-                cols.append(f'{data.mean():0.2f} ± {2*data.std():0.2f} [{len(data)}]')
+                txt = f'{data.mean():0.2f} ± {2*data.std():0.2f} [{len(data)}]' if not SHOW_ONLY_COUNT else f'[{len(data)}]'
+                cols.append(txt)
         matrix[row_name] = cols
     
     df = pd.DataFrame.from_dict(matrix,orient='index',columns=COL_NAMES)
@@ -65,25 +66,25 @@ def topic_handlers_to_dataframe(topic_handlers):
 ROS_NODE_NAME = 'uwb_tviz'
 A_IDS = [0,1,2,3,4,5]
 B_IDS = [6,7,8,9,10,11]
-SHOW_ONLY_SPECIFIED = False
-SHOW_SYMMETRIC = True
+SHOW_ONLY_SPECIFIED = True
+SHOW_ONLY_COUNT = False
 RATE = 1
 
 # SHOW_ONLY_SPECIFIED
-# :: True: cols will only be shown for IDs specified in A_IDS + B_IDS
+# :: True: cols will only be shown for IDs specified in B_IDS
 # :: False: cols will be shown for any ID heard from
 
-# SHOW_SYMMETRIC
-# :: True: shows A <=> B range measurements
-# :: False: shows only A => B range measurments
+# SHOW_ONLY_COUNT
+# :: True: shows only number of messages
+# :: False: shows mean, std, and number of messages
 
 NODE_IDS = A_IDS + B_IDS
 A_NAMES = list(map(node_id_to_name,A_IDS))
 B_NAMES = list(map(node_id_to_name,B_IDS))
 NODE_NAMES = A_NAMES + B_NAMES
 
-LISTENER_IDS = NODE_IDS if SHOW_SYMMETRIC else A_IDS
-SHOW_COLS = NODE_NAMES if SHOW_SYMMETRIC else B_NAMES
+LISTENER_IDS = A_IDS
+SHOW_COLS = B_NAMES
 
 TOPIC_HANDLERS = [UWBTopicHandler(node_id) for node_id in LISTENER_IDS]
 
